@@ -18,7 +18,7 @@ Inform all users and teams of the planned maintenance window. In my case downtim
 SHOW SLAVE STATUS\G
 ```
 
-text
+
 Ensure `Slave_IO_Running` and `Slave_SQL_Running` are both `Yes` on all slaves.
 
 ### 1.3 Backup All Data
@@ -26,14 +26,14 @@ Ensure `Slave_IO_Running` and `Slave_SQL_Running` are both `Yes` on all slaves.
 **Database Backup:**
 mysqldump --all-databases --single-transaction --lock-tables=false > /home/all-databases-$(date +%F).sql
 
-text
+
 
 **Configuration Backup:**
 ```sh
 cp /etc/my.cnf /etc/my.cnf.bak
 cp -r /var/lib/mysql /var/lib/mysql_bak
 ```
-text
+
 
 ---
 
@@ -46,7 +46,7 @@ text
 ```sh
 sudo systemctl stop mariadb
 ```
-text
+
 
 ### 2.2 Remove Old MariaDB Packages
 
@@ -54,14 +54,14 @@ text
 sudo yum remove "mariadb-*"
 sudo yum remove galera-4
 ```
-text
+
 
 ### 2.3 Clean Up Old Repository Files if exists.
 
 ```sh
 sudo mv /etc/yum.repos.d/mariadb.repo /etc/yum.repos.d/mariadb.repo.bak
 ```
-text
+
 
 ### 2.4 Add MariaDB 10.6 Repository
 
@@ -71,21 +71,21 @@ $ curl -LsSO https://r.mariadb.com/downloads/mariadb_repo_setup
 $ chmod +x mariadb_repo_setup
 $ sudo ./mariadb_repo_setup --mariadb-server-version="mariadb-10.6"
 ```
-text
+
 
 ### 2.5 Install MariaDB 10.6
 
 ```sh
 sudo yum install MariaDB-server MariaDB-backup
 ```
-text
+
 
 ### 2.6 Start MariaDB
 
 ```sh
 sudo systemctl start mariadb
 ```
-text
+
 Note: If error comes while starting the mariadb service then look for folder /run/mariadb. If it does not exist then create it and give ownership to mysql user.
 
 ```sh
@@ -97,21 +97,21 @@ chown mysql:mysql /run/mariadb
 ```sh
 sudo mysql_upgrade
 ```
-text
+
 
 ### 2.8 Enable MariaDB at Boot
 
 ```sh
 sudo systemctl enable mariadb
 ```
-text
+
 
 ### 2.9 Verify Upgrade
 
 ```sh
 mysql -V
 ```
-text
+
 
 ---
 
@@ -122,14 +122,14 @@ text
 ```sh
 SHOW SLAVE STATUS\G
 ```
-text
+
 
 ### 3.2 Monitor Logs
 
 ```sh
 tail -f /var/log/mariadb/mariadb.log
 ```
-text
+
 
 ### 3.3 Test Application Connectivity
 
@@ -145,7 +145,7 @@ Ensure your application can connect and operate as expected.
 SET GLOBAL read_only = ON;
 FLUSH TABLES WITH READ LOCK;
 ```
-text
+
 
 ### 4.2 After Upgrade, Remove Read-Only and Unlock
 
@@ -153,7 +153,7 @@ text
 SET GLOBAL read_only = OFF;
 UNLOCK TABLES;
 ```
-text
+
 
 ---
 
@@ -183,7 +183,7 @@ session_track_system_variables=last_gtid
 log-basename=slave2
 binlog_expire_logs_seconds=604800
 ```
-text
+
 
 ---
 
@@ -200,7 +200,7 @@ sudo cp -r /var/lib/mysql_bak/* /var/lib/mysql/
 sudo cp /etc/my.cnf.bak /etc/my.cnf
 sudo systemctl start mariadb
 ```
-text
+
 
 ---
 
@@ -228,7 +228,7 @@ Start MariaDB on other nodes
 ```sh
 sudo systemctl start mariadb
 ```
-text
+
 
 ---
 
