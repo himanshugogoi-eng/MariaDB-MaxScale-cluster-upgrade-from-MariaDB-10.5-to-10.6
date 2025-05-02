@@ -1,1 +1,0 @@
-# MariaDB-MaxScale-cluster-upgrade-from-MariaDB-10.5-to-10.6
