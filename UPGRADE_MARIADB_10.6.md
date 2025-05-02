@@ -24,10 +24,10 @@ Ensure `Slave_IO_Running` and `Slave_SQL_Running` are both `Yes` on all slaves.
 ### 1.3 Backup All Data
 
 **Database Backup:**
+
+```sh
 mysqldump --all-databases --single-transaction --lock-tables=false > /home/all-databases-$(date +%F).sql
-
-
-
+```
 **Configuration Backup:**
 ```sh
 cp /etc/my.cnf /etc/my.cnf.bak
@@ -66,10 +66,10 @@ sudo mv /etc/yum.repos.d/mariadb.repo /etc/yum.repos.d/mariadb.repo.bak
 ### 2.4 Add MariaDB 10.6 Repository
 
 ```sh
-$ sudo yum install curl
-$ curl -LsSO https://r.mariadb.com/downloads/mariadb_repo_setup
-$ chmod +x mariadb_repo_setup
-$ sudo ./mariadb_repo_setup --mariadb-server-version="mariadb-10.6"
+ sudo yum install curl
+ curl -LsSO https://r.mariadb.com/downloads/mariadb_repo_setup
+ chmod +x mariadb_repo_setup
+ sudo ./mariadb_repo_setup --mariadb-server-version="mariadb-10.6"
 ```
 
 
