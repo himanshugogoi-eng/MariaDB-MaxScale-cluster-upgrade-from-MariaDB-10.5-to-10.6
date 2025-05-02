@@ -1,5 +1,5 @@
 # MariaDB 10.5 to 10.6 Upgrade Plan (Rocky Linux, GTID Replication)
-![MariaDB](https://img.shields.io/badge/MariaDB-10.5.22-blue) ![MariaDB](https://img.shields.io/badge/MariaDB-10.6.21-blue)
+![MariaDB](https://img.shields.io/badge/MariaDB-10.5.22-blue) ![MariaDB](https://img.shields.io/badge/MariaDB-10.6.21-blue) ![MaxScale](https://img.shields.io/badge/MaxScale-24.02.4-blue) ![Rocky Linux](https://img.shields.io/badge/Rocky-Linux-9.5-green)
 
 
 ## Overiew
