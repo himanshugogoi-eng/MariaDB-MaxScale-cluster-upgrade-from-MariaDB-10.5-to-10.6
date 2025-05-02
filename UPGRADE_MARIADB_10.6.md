@@ -1,4 +1,6 @@
 # MariaDB 10.5 to 10.6 Upgrade Plan (Rocky Linux, GTID Replication)
+![MariaDB](https://img.shields.io/badge/MariaDB-10.5.22-blue) ![MariaDB](https://img.shields.io/badge/MariaDB-10.6.21-blue)
+
 
 ## Overiew
 This guide details the process for upgrading a MariaDB GTID replication cluster from 10.5 to 10.6 on Rocky Linux.  
