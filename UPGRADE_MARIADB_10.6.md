@@ -1,7 +1,6 @@
 # MariaDB 10.5 to 10.6 Upgrade Plan (Rocky Linux, GTID Replication)
 
-# MariaDB 10.5 to 10.6 Upgrade Plan (Rocky Linux, GTID Replication)
-
+## Overiew
 This guide details the process for upgrading a MariaDB GTID replication cluster from 10.5 to 10.6 on Rocky Linux.  
 **Cluster topology:** 1 master, 2 slaves, GTID replication, 2 MaxScale proxies.
 
@@ -15,7 +14,9 @@ Inform all users and teams of the planned maintenance window. In my case downtim
 
 ### 1.2 Check Replication Health
 
+```sh
 SHOW SLAVE STATUS\G
+```
 
 text
 Ensure `Slave_IO_Running` and `Slave_SQL_Running` are both `Yes` on all slaves.
@@ -23,14 +24,15 @@ Ensure `Slave_IO_Running` and `Slave_SQL_Running` are both `Yes` on all slaves.
 ### 1.3 Backup All Data
 
 **Database Backup:**
-mysqldump --all-databases --single-transaction --quick --lock-tables=false > /root/all-databases-$(date +%F).sql
+mysqldump --all-databases --single-transaction --lock-tables=false > /home/all-databases-$(date +%F).sql
 
 text
 
 **Configuration Backup:**
+```sh
 cp /etc/my.cnf /etc/my.cnf.bak
 cp -r /var/lib/mysql /var/lib/mysql_bak
-
+```
 text
 
 ---
@@ -41,60 +43,74 @@ text
 
 ### 2.1 Stop MariaDB
 
+```sh
 sudo systemctl stop mariadb
-
+```
 text
 
 ### 2.2 Remove Old MariaDB Packages
 
-sudo yum remove "MariaDB-*"
+```sh
+sudo yum remove "mariadb-*"
 sudo yum remove galera-4
-
+```
 text
 
-### 2.3 Clean Up Old Repository Files
+### 2.3 Clean Up Old Repository Files if exists.
 
+```sh
 sudo mv /etc/yum.repos.d/mariadb.repo /etc/yum.repos.d/mariadb.repo.bak
-
+```
 text
 
 ### 2.4 Add MariaDB 10.6 Repository
 
-sudo yum install curl
-curl -LsSO https://r.mariadb.com/downloads/mariadb_repo_setup
-chmod +x mariadb_repo_setup
-sudo ./mariadb_repo_setup --mariadb-server-version="mariadb-10.6"
-
+```sh
+$ sudo yum install curl
+$ curl -LsSO https://r.mariadb.com/downloads/mariadb_repo_setup
+$ chmod +x mariadb_repo_setup
+$ sudo ./mariadb_repo_setup --mariadb-server-version="mariadb-10.6"
+```
 text
 
 ### 2.5 Install MariaDB 10.6
 
+```sh
 sudo yum install MariaDB-server MariaDB-backup
-
+```
 text
 
 ### 2.6 Start MariaDB
 
+```sh
 sudo systemctl start mariadb
-
+```
 text
+Note: If error comes while starting the mariadb service then look for folder /run/mariadb. If it does not exist then create it and give ownership to mysql user.
 
+```sh
+mkdir -p /run/mariadb
+chown mysql:mysql /run/mariadb
+```
 ### 2.7 Run the Upgrade Script
 
+```sh
 sudo mysql_upgrade
-
+```
 text
 
 ### 2.8 Enable MariaDB at Boot
 
+```sh
 sudo systemctl enable mariadb
-
+```
 text
 
 ### 2.9 Verify Upgrade
 
+```sh
 mysql -V
-
+```
 text
 
 ---
@@ -103,14 +119,16 @@ text
 
 ### 3.1 Check Replication Status
 
+```sh
 SHOW SLAVE STATUS\G
-
+```
 text
 
 ### 3.2 Monitor Logs
 
+```sh
 tail -f /var/log/mariadb/mariadb.log
-
+```
 text
 
 ### 3.3 Test Application Connectivity
@@ -123,16 +141,18 @@ Ensure your application can connect and operate as expected.
 
 ### 4.1 Set Master to Read-Only Before Upgrade
 
+```sh
 SET GLOBAL read_only = ON;
 FLUSH TABLES WITH READ LOCK;
-
+```
 text
 
 ### 4.2 After Upgrade, Remove Read-Only and Unlock
 
+```sh
 SET GLOBAL read_only = OFF;
 UNLOCK TABLES;
-
+```
 text
 
 ---
@@ -141,6 +161,7 @@ text
 
 Ensure your `/etc/my.cnf` on slaves contains:
 
+```sh
 [mysqld]
 datadir=/var/lib/mysql
 socket=/var/lib/mysql/mysql.sock
@@ -161,7 +182,7 @@ expire_logs_days=7
 session_track_system_variables=last_gtid
 log-basename=slave2
 binlog_expire_logs_seconds=604800
-
+```
 text
 
 ---
@@ -173,10 +194,12 @@ If issues arise, stop MariaDB and restore from backup:
 sudo systemctl stop mariadb
 
 Restore files from your backup location
+
+```sh
 sudo cp -r /var/lib/mysql_bak/* /var/lib/mysql/
 sudo cp /etc/my.cnf.bak /etc/my.cnf
 sudo systemctl start mariadb
-
+```
 text
 
 ---
@@ -186,17 +209,25 @@ text
 If MariaDB fails to start due to Galera errors, follow these steps:
 
 On the node with the highest sequence number:
+
+```sh
 cat /var/lib/mysql/grastate.dat
-
+```
 If safe_to_bootstrap: 0, set to 1
+
+```sh
 sudo sed -i 's/safe_to_bootstrap: 0/safe_to_bootstrap: 1/' /var/lib/mysql/grastate.dat
-
+```
 Bootstrap the cluster
+
+```sh
 sudo galera_new_cluster
-
+```
 Start MariaDB on other nodes
-sudo systemctl start mariadb
 
+```sh
+sudo systemctl start mariadb
+```
 text
 
 ---
